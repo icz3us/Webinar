@@ -8,9 +8,21 @@ export type AdminRegistration = {
 
 export async function getEventData() {
   const supabase = createAdminClient();
-  if (!supabase) throw new Error("Supabase service role is not configured.");
+  if (!supabase) {
+    return {
+      event: { id: "placeholder", title: "Deepfakes & Digital Trust", slug: "deepfakes-digital-trust-2026", description: "", event_date: "2026-10-11", created_at: "", updated_at: "" },
+      sessions: [],
+      registrations: [],
+    };
+  }
   const { data: event, error: eventError } = await supabase.from("events").select("*").eq("slug", "deepfakes-digital-trust-2026").single();
-  if (eventError) throw new Error("Database setup is incomplete. Apply supabase/migrations/001_initial.sql and supabase/seed.sql.");
+  if (eventError || !event) {
+    return {
+      event: { id: "placeholder", title: "Deepfakes & Digital Trust", slug: "deepfakes-digital-trust-2026", description: "", event_date: "2026-10-11", created_at: "", updated_at: "" },
+      sessions: [],
+      registrations: [],
+    };
+  }
   const [{ data: sessions, error: sessionsError }, { data: registrations, error: registrationsError }] = await Promise.all([
     supabase.from("sessions").select("*").eq("event_id", event.id).order("start_time"),
     supabase.from("registrations").select("*, registration_sessions(session:sessions(id,title,slug)), attendance(session_id,status), certificates(session_id,certificate_number,status)").eq("event_id", event.id).is("cancelled_at", null).order("created_at", { ascending: false }),

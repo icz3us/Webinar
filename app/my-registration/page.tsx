@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { EVENT } from "@/lib/event";
 
+export const dynamic = "force-dynamic";
+
 type SessionInfo = { id: string; title: string; slug: string };
 type AttendanceRecord = { session_id: string; status: string };
 type CertificateRecord = {
