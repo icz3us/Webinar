@@ -1,0 +1,111 @@
+.admin-logout {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 16px;
+  border: 1px solid #5a5d55;
+  background: transparent;
+  color: #eceae3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.admin-logout:hover {
+  background: #eceae3;
+  color: #1b1d1a;
+}
+
+.admin-logout svg {
+  width: 17px;
+}
+
+.admin-logout:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.message-panel {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: 36px;
+  padding: 28px;
+  margin-bottom: 28px;
+  border-top: 5px solid #cf4c10;
+  background: #f8f6ef;
+}
+
+.message-panel h2 {
+  margin: 8px 0;
+  font-size: 30px;
+  letter-spacing: -0.04em;
+}
+
+.message-panel > div > span {
+  color: #cf4c10;
+  font: 600 10px var(--font-geist-mono);
+}
+
+.message-panel > div > p {
+  color: #676860;
+  line-height: 1.5;
+}
+
+.message-panel form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.message-panel label span {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 650;
+}
+
+.message-panel input,
+.message-panel select,
+.message-panel textarea {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #898a82;
+  background: #fff;
+  padding: 10px 12px;
+}
+
+.message-panel textarea {
+  resize: vertical;
+}
+
+.message-wide,
+.message-status {
+  grid-column: 1 / -1;
+}
+
+.message-status {
+  margin: 0;
+  padding: 11px;
+  border-left: 4px solid #426b4c;
+  background: #e8f1e7;
+}
+
+.table-actions {
+  display: flex;
+  gap: 7px;
+}
+
+@media (max-width: 800px) {
+  .message-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .message-panel form {
+    grid-template-columns: 1fr;
+  }
+
+  .message-wide,
+  .message-status {
+    grid-column: auto;
+  }
+}
