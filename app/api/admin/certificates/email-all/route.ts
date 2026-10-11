@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import { emailLayout, escapeHtml } from "@/lib/email-html";
+import { hasUserSubmittedSurvey } from "@/lib/surveys";
 
 type CertificateBundleItem = {
   number: string;
@@ -62,18 +63,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Certificates could not be loaded." }, { status: 500 });
   }
 
-  // 3. Auto-generate any missing certificates for present attendees
+  // 3. Auto-generate missing certificates ONLY for attendees who are present AND completed the survey
   const existingSet = new Set((existingCerts ?? []).map((c) => `${c.registration_id}:${c.session_id}`));
-  const missing = (attendance ?? []).filter((a) => !existingSet.has(`${a.registration_id}:${a.session_id}`));
+  const missingCandidates = (attendance ?? []).filter((a) => !existingSet.has(`${a.registration_id}:${a.session_id}`));
 
-  if (missing.length > 0) {
-    const newRows = missing.map((row) => ({
-      registration_id: row.registration_id,
-      session_id: row.session_id,
-      generated_by: user.id,
-      status: "issued",
-      issued_at: new Date().toISOString(),
-    }));
+  const newRows: {
+    registration_id: string;
+    session_id: string;
+    generated_by: string;
+    status: string;
+    issued_at: string;
+  }[] = [];
+
+  for (const row of missingCandidates) {
+    const surveyDone = await hasUserSubmittedSurvey(row.registration_id, row.session_id);
+    if (surveyDone) {
+      newRows.push({
+        registration_id: row.registration_id,
+        session_id: row.session_id,
+        generated_by: user.id,
+        status: "issued",
+        issued_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  if (newRows.length > 0) {
     await admin.from("certificates").insert(newRows);
   }
 
@@ -92,9 +107,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Issued certificates could not be loaded." }, { status: 500 });
   }
 
-  // Strictly filter only certificates where attendee was marked present
+  // Strictly filter certificates where attendee was marked present AND completed the survey
   const presentKeys = new Set((attendance ?? []).map((a) => `${a.registration_id}:${a.session_id}`));
-  const eligible = (allIssued ?? []).filter((c) => presentKeys.has(`${c.registration_id}:${c.session_id}`));
+  
+  const eligibleFiltered: typeof allIssued = [];
+  for (const c of allIssued ?? []) {
+    if (!presentKeys.has(`${c.registration_id}:${c.session_id}`)) continue;
+    const surveyDone = await hasUserSubmittedSurvey(c.registration_id, c.session_id);
+    if (surveyDone) {
+      eligibleFiltered.push(c);
+    }
+  }
+
+  const eligible = eligibleFiltered;
 
   if (!eligible.length) {
     return NextResponse.json({ total: 0, sent: 0, failed: 0, totalCertificates: 0 });

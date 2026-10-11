@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { hasUserSubmittedSurvey } from "@/lib/surveys";
 
 export async function POST(request: Request) {
   const { sessionId } = await request.json().catch(() => ({}));
@@ -26,15 +27,40 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ error: "Certificate eligibility could not be checked." }, { status: 500 });
 
   const existingSet = new Set((existing ?? []).map((item) => `${item.registration_id}:${item.session_id}`));
-  const rows = (eligible ?? [])
-    .filter((row) => !existingSet.has(`${row.registration_id}:${row.session_id}`))
-    .map((row) => ({
-      registration_id: row.registration_id,
-      session_id: row.session_id,
-      generated_by: user.id,
-      status: "issued",
-      issued_at: new Date().toISOString(),
-    }));
+  
+  // A participant must satisfy ALL 3 conditions: Registered + Present + Completed Required Survey
+  const qualifiedRows: {
+    registration_id: string;
+    session_id: string;
+    generated_by: string;
+    status: string;
+    issued_at: string;
+  }[] = [];
+
+  const candidates = (eligible ?? []).filter(
+    (row) => !existingSet.has(`${row.registration_id}:${row.session_id}`)
+  );
+
+  const checkResults = await Promise.all(
+    candidates.map(async (row) => ({
+      row,
+      surveyDone: await hasUserSubmittedSurvey(row.registration_id, row.session_id),
+    }))
+  );
+
+  for (const { row, surveyDone } of checkResults) {
+    if (surveyDone) {
+      qualifiedRows.push({
+        registration_id: row.registration_id,
+        session_id: row.session_id,
+        generated_by: user.id,
+        status: "issued",
+        issued_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  const rows = qualifiedRows;
 
   if (rows.length) {
     const { error: insertError } = await supabase.from("certificates").insert(rows);
@@ -48,6 +74,9 @@ export async function POST(request: Request) {
     entity_id: sessionId ?? "all",
     metadata: { count: rows.length },
   });
+
+  const { invalidateAdminCache } = await import("@/lib/admin-data");
+  invalidateAdminCache();
 
   return NextResponse.json({ generated: rows.length });
 }

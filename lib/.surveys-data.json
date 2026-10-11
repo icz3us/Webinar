@@ -1,0 +1,259 @@
+{
+  "surveys": [
+    {
+      "id": "survey-1791466340875-4m2u3",
+      "eventId": "6e3f36c6-431a-4f00-b146-34daad437e2f",
+      "sessionId": "70b39a4e-aeba-4560-b9fe-f691e78cc029",
+      "title": "survey sample",
+      "description": "www",
+      "status": "published",
+      "publicSlug": "session12",
+      "closingAt": "2026-10-11T13:31:00.000Z",
+      "createdBy": "2a5d679b-44c4-44ff-80b2-24d756ed7f13",
+      "createdAt": "2026-10-08T13:32:20.875Z",
+      "updatedAt": "2026-10-08T13:32:20.875Z",
+      "publishedAt": "2026-10-08T13:32:20.875Z",
+      "closedAt": null,
+      "questions": [
+        {
+          "id": "q-survey-1791466340875-4m2u3-1-w0vf",
+          "surveyId": "survey-1791466340875-4m2u3",
+          "question": "pogi bako",
+          "description": null,
+          "questionType": "rating",
+          "required": true,
+          "options": [],
+          "position": 1,
+          "createdAt": "2026-10-08T13:32:20.875Z",
+          "updatedAt": "2026-10-08T13:32:20.875Z"
+        },
+        {
+          "id": "q-survey-1791466340875-4m2u3-2-whlq",
+          "surveyId": "survey-1791466340875-4m2u3",
+          "question": "are you black",
+          "description": null,
+          "questionType": "checkbox",
+          "required": true,
+          "options": [
+            "Option 1",
+            "Option 2"
+          ],
+          "position": 2,
+          "createdAt": "2026-10-08T13:32:20.875Z",
+          "updatedAt": "2026-10-08T13:32:20.875Z"
+        }
+      ]
+    },
+    {
+      "id": "survey-session-1-default",
+      "eventId": "6e3f36c6-431a-4f00-b146-34daad437e2f",
+      "sessionId": "70b39a4e-aeba-4560-b9fe-f691e78cc029",
+      "title": "Session 1 Feedback: Deepfakes in Everyday Social Media",
+      "description": "Thank you for attending Session 1. Please complete this brief survey to provide feedback and unlock certificate eligibility.",
+      "status": "published",
+      "publicSlug": "session-1-feedback-social",
+      "closingAt": null,
+      "createdBy": "admin",
+      "createdAt": "2026-10-08T13:07:31.338Z",
+      "updatedAt": "2026-10-08T13:07:31.338Z",
+      "publishedAt": "2026-10-08T13:07:31.338Z",
+      "closedAt": null,
+      "session": {
+        "id": "70b39a4e-aeba-4560-b9fe-f691e78cc029",
+        "slug": "session-1",
+        "title": "Deepfakes in Everyday Social Media (TikTok, Facebook, Instagram)"
+      },
+      "questions": [
+        {
+          "id": "q1-1",
+          "surveyId": "survey-session-1-default",
+          "question": "How would you rate the overall quality of Session 1?",
+          "description": "Please rate from 1 (poor) to 5 (excellent).",
+          "questionType": "rating",
+          "required": true,
+          "options": [],
+          "position": 1,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q1-2",
+          "surveyId": "survey-session-1-default",
+          "question": "Was the presentation material clear and easy to follow?",
+          "description": null,
+          "questionType": "yes_no",
+          "required": true,
+          "options": [],
+          "position": 2,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q1-3",
+          "surveyId": "survey-session-1-default",
+          "question": "Which session segment did you find most informative?",
+          "description": "Select the topic that stood out most.",
+          "questionType": "multiple_choice",
+          "required": true,
+          "options": [
+            "How AI is Changing Social Media",
+            "Spotting Everyday Fakes",
+            "Speaker Discussions",
+            "Q&A Segment"
+          ],
+          "position": 3,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q1-4",
+          "surveyId": "survey-session-1-default",
+          "question": "Which platforms do you frequently encounter synthetic media on?",
+          "description": "Select all that apply.",
+          "questionType": "checkbox",
+          "required": false,
+          "options": [
+            "TikTok",
+            "Facebook",
+            "Instagram",
+            "X (Twitter)",
+            "YouTube",
+            "Messaging Apps"
+          ],
+          "position": 4,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q1-5",
+          "surveyId": "survey-session-1-default",
+          "question": "What was your primary takeaway from this session?",
+          "description": "Briefly share key lessons learned.",
+          "questionType": "long_text",
+          "required": true,
+          "options": [],
+          "position": 5,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q1-6",
+          "surveyId": "survey-session-1-default",
+          "question": "Any suggestions or additional comments for the speakers?",
+          "description": "Optional feedback.",
+          "questionType": "short_text",
+          "required": false,
+          "options": [],
+          "position": 6,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        }
+      ]
+    },
+    {
+      "id": "survey-session-2-default",
+      "eventId": "6e3f36c6-431a-4f00-b146-34daad437e2f",
+      "sessionId": "4d39b14d-f6af-4f81-9fda-d9f29f67dc12",
+      "title": "Session 2 Feedback: Deepfakes in the Workplace and School",
+      "description": "Thank you for attending Session 2. Please complete this brief survey to provide feedback and unlock certificate eligibility.",
+      "status": "published",
+      "publicSlug": "session-2-feedback-workplace",
+      "closingAt": null,
+      "createdBy": "admin",
+      "createdAt": "2026-10-08T13:07:31.338Z",
+      "updatedAt": "2026-10-08T13:07:31.338Z",
+      "publishedAt": "2026-10-08T13:07:31.338Z",
+      "closedAt": null,
+      "session": {
+        "id": "4d39b14d-f6af-4f81-9fda-d9f29f67dc12",
+        "slug": "session-2",
+        "title": "Deepfakes in the Workplace and School (Email, Zoom, News)"
+      },
+      "questions": [
+        {
+          "id": "q2-1",
+          "surveyId": "survey-session-2-default",
+          "question": "How would you rate the overall quality of Session 2?",
+          "description": "Please rate from 1 (poor) to 5 (excellent).",
+          "questionType": "rating",
+          "required": true,
+          "options": [],
+          "position": 1,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q2-2",
+          "surveyId": "survey-session-2-default",
+          "question": "Did this session improve your understanding of verification techniques in school or work?",
+          "description": null,
+          "questionType": "yes_no",
+          "required": true,
+          "options": [],
+          "position": 2,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q2-3",
+          "surveyId": "survey-session-2-default",
+          "question": "Which workplace or academic risk felt most relevant to your environment?",
+          "description": "Select one.",
+          "questionType": "multiple_choice",
+          "required": true,
+          "options": [
+            "Executive Impersonation / Voice Cloning",
+            "Phishing with Generative AI",
+            "Academic Integrity and Deepfakes",
+            "Media Manipulation in News"
+          ],
+          "position": 3,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q2-4",
+          "surveyId": "survey-session-2-default",
+          "question": "Which verification habits do you plan to adopt?",
+          "description": "Select all that apply.",
+          "questionType": "checkbox",
+          "required": false,
+          "options": [
+            "Multi-channel verification",
+            "Examining metadata and artifacts",
+            "Direct voice or video confirmation",
+            "Institutional reporting protocols"
+          ],
+          "position": 4,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q2-5",
+          "surveyId": "survey-session-2-default",
+          "question": "What was your primary takeaway from this session?",
+          "description": "Briefly share key lessons learned.",
+          "questionType": "long_text",
+          "required": true,
+          "options": [],
+          "position": 5,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        },
+        {
+          "id": "q2-6",
+          "surveyId": "survey-session-2-default",
+          "question": "Any suggestions or additional comments for the speakers?",
+          "description": "Optional feedback.",
+          "questionType": "short_text",
+          "required": false,
+          "options": [],
+          "position": 6,
+          "createdAt": "2026-10-08T13:07:31.338Z",
+          "updatedAt": "2026-10-08T13:07:31.338Z"
+        }
+      ]
+    }
+  ],
+  "responses": []
+}

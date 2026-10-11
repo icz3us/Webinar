@@ -4,14 +4,36 @@ import { registrationSchema } from "@/lib/validation";
 import { sendEmail } from "@/lib/email";
 import { checkRegistrationRateLimit } from "@/lib/rate-limit";
 
+import { getPublishedSurveysSummary, getCompletedSurveySessionIds } from "@/lib/surveys";
+
 export async function GET() {
   const supabase = await createClient();
   if (!supabase) return NextResponse.json({ registration: null, demo: true });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  const { data, error } = await supabase.from("registrations").select("*, registration_sessions(session_id, sessions(*))").eq("user_id", user.id).maybeSingle();
-  if (error) return NextResponse.json({ error: "We could not load your registration." }, { status: 500 });
-  return NextResponse.json({ registration: data });
+
+  const [regResult, publishedSurveys] = await Promise.all([
+    supabase
+      .from("registrations")
+      .select("*, registration_sessions(session_id, sessions(*)), attendance(session_id, status), certificates(session_id, certificate_number, status, issued_at)")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    getPublishedSurveysSummary(),
+  ]);
+
+  if (regResult.error) {
+    return NextResponse.json({ error: "We could not load your registration." }, { status: 500 });
+  }
+
+  const completedSurveySessions = regResult.data?.id
+    ? await getCompletedSurveySessionIds(regResult.data.id)
+    : new Set<string>();
+
+  return NextResponse.json({
+    registration: regResult.data,
+    surveys: publishedSurveys,
+    completedSurveySessionIds: Array.from(completedSurveySessions),
+  });
 }
 
 export async function POST(request: Request) {
@@ -52,6 +74,10 @@ export async function POST(request: Request) {
     subject: "Registration recorded: Deepfakes and Digital Trust",
     html: `<p>Hello ${escapeHtml(parsed.data.fullName)},</p><p>Your registration for Deepfakes and Digital Trust on October 11, 2026 has been recorded.</p><p>Selected sessions: ${parsed.data.sessions.map(escapeHtml).join(", ")}.</p>`,
   });
+
+  const { invalidateAdminCache } = await import("@/lib/admin-data");
+  invalidateAdminCache();
+
   return NextResponse.json({ registrationId: registration.id, emailDelivered: email.delivered }, { status: 201 });
 }
 
