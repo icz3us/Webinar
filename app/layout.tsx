@@ -12,8 +12,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { EVENT } from "@/lib/event";
+
 export const metadata: Metadata = {
-  title: "Deepfakes & Digital Trust | October 11, 2026",
+  title: `Deepfakes & Digital Trust | ${EVENT.date}`,
   description: "Register for the Deepfakes and Digital Trust webinar on recognizing AI-generated media and misinformation.",
 };
 

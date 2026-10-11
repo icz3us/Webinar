@@ -4,6 +4,8 @@ import RegistrationForm from "@/components/registration-form";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedSurveysSummary, getCompletedSurveySessionIds } from "@/lib/surveys";
 
+import { EVENT } from "@/lib/event";
+
 export default async function RegistrationHome() {
   let initialUser: { id: string; email: string; name?: string } | null = null;
   let initialRegistration = null;
@@ -48,7 +50,7 @@ export default async function RegistrationHome() {
       <header className="registration-header shell">
         <div>
           <strong>Deepfakes &amp; Digital Trust</strong>
-          <span>October 11, 2026</span>
+          <span>{EVENT.date}</span>
         </div>
         <a href="/verify">Verify certificate</a>
       </header>

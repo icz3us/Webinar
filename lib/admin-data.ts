@@ -19,12 +19,14 @@ export type EventDataResult = {
   registrations: AdminRegistration[];
 };
 
+import { EVENT } from "@/lib/event";
+
 const DEFAULT_EVENT = {
   id: "placeholder",
   title: "Deepfakes & Digital Trust",
   slug: "deepfakes-digital-trust-2026",
   description: "",
-  event_date: "2026-10-11",
+  event_date: EVENT.isoDate,
   created_at: "",
   updated_at: "",
 };

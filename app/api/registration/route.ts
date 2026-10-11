@@ -69,10 +69,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "We could not save your session choices." }, { status: 500 });
   }
 
+  const { EVENT } = await import("@/lib/event");
   const email = await sendEmail({
     to: user.email,
     subject: "Registration recorded: Deepfakes and Digital Trust",
-    html: `<p>Hello ${escapeHtml(parsed.data.fullName)},</p><p>Your registration for Deepfakes and Digital Trust on October 11, 2026 has been recorded.</p><p>Selected sessions: ${parsed.data.sessions.map(escapeHtml).join(", ")}.</p>`,
+    html: `<p>Hello ${escapeHtml(parsed.data.fullName)},</p><p>Your registration for Deepfakes and Digital Trust on ${escapeHtml(EVENT.date)} has been recorded.</p><p>Selected sessions: ${parsed.data.sessions.map(escapeHtml).join(", ")}.</p>`,
   });
 
   const { invalidateAdminCache } = await import("@/lib/admin-data");
