@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { ShieldCheck } from "lucide-react";
+import { Mail, ShieldCheck } from "lucide-react";
+import posterImage from "@/public/images/1.png";
 import RegistrationForm from "@/components/registration-form";
 import { createClient } from "@/lib/supabase/server";
 import { getPublishedSurveysSummary, getCompletedSurveySessionIds } from "@/lib/surveys";
@@ -57,12 +58,11 @@ export default async function RegistrationHome() {
       <section className="registration-direct shell" aria-labelledby="registration-title">
         <aside className="event-poster-panel">
           <Image
-            src="/images/1.png"
+            src={posterImage}
             alt="Deepfakes and Digital Trust webinar poster with event schedule and organizer marks"
-            width={1080}
-            height={1350}
             priority
             sizes="(max-width: 900px) 100vw, 42vw"
+            placeholder="blur"
           />
           <div className="direct-summary">
             <span className="section-index">REGISTRATION / OPEN</span>
@@ -78,6 +78,9 @@ export default async function RegistrationHome() {
               <span>Deepfakes in the Workplace and School</span>
               <strong>2:00 PM - 7:00 PM</strong>
             </div>
+            <p className="direct-note">
+              <Mail aria-hidden="true" /> The Google Meet link will be sent to your email.
+            </p>
             <p className="direct-note">
               <ShieldCheck aria-hidden="true" /> Select one or both sessions. Separate e-certificates are provided for each session attended.
             </p>

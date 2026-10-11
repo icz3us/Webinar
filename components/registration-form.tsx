@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Check, CheckCircle2, ClipboardCheck, LoaderCircle } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, ClipboardCheck, LoaderCircle, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { EVENT } from "@/lib/event";
 import { registrationSchema, type RegistrationInput } from "@/lib/validation";
@@ -353,6 +353,27 @@ export default function RegistrationForm({
 
           <div
             style={{
+              padding: "12px 16px",
+              background: "#fffaf0",
+              border: "1px solid #ffd8a8",
+              borderLeft: "4px solid #b74700",
+              margin: "18px 0",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              fontSize: "13px",
+              color: "#4a3b32",
+              lineHeight: 1.5,
+            }}
+          >
+            <Mail size={18} style={{ color: "#ad4700", flexShrink: 0 }} aria-hidden="true" />
+            <span>
+              <strong>Google Meet Link:</strong> The session access link will be sent to <strong>{existingRegistration.email}</strong> via email.
+            </span>
+          </div>
+
+          <div
+            style={{
               padding: "clamp(14px, 3vw, 20px) clamp(12px, 3vw, 24px)",
               background: "#fff",
               border: "1px solid var(--line, #c9c7bd)",
@@ -483,7 +504,7 @@ export default function RegistrationForm({
         <div className="auth-gate">
           <span className="form-step">00 / VERIFY EMAIL</span>
           <h3>Begin with your Google account</h3>
-          <p>Your verified email will be used for the Google Meet link and e-certificate.</p>
+          <p>The Google Meet link and your e-certificate will be sent to your verified email.</p>
           <button
             className="button google-button"
             type="button"
@@ -521,7 +542,7 @@ export default function RegistrationForm({
           </legend>
           <FormField
             label="Email Address"
-            description="Please provide an active email where we will send the Google Meet link and e-certificate."
+            description="The Google Meet link and e-certificate will be sent to this email."
             error={errors.email?.message}
           >
             <input
@@ -624,6 +645,26 @@ export default function RegistrationForm({
             {errorMessage}
           </p>
         )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            padding: "12px 14px",
+            background: "#fffaf0",
+            border: "1px solid #ffd8a8",
+            borderLeft: "4px solid #b74700",
+            margin: "18px 0 20px",
+            fontSize: "13px",
+            color: "#4a3b32",
+            lineHeight: 1.5,
+          }}
+        >
+          <Mail size={18} style={{ color: "#ad4700", flexShrink: 0 }} aria-hidden="true" />
+          <span>
+            <strong>Google Meet Link:</strong> The session link will be sent to your email.
+          </span>
+        </div>
         <button className="button button-primary submit-button" type="submit" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
