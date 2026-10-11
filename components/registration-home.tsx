@@ -95,7 +95,7 @@ export default async function RegistrationHome() {
         />
       </section>
       <footer className="registration-footer shell">
-        <span>Gordon College · College of Computer Studies</span>
+        <span>GCCCS - ByteCast</span>
         <div>
           <a href="/verify">Certificate verification</a>
           <a href="/admin">Admin login</a>

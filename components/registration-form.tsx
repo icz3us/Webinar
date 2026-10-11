@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, Check, CheckCircle2, ClipboardCheck, LoaderCircle, Mail } from "lucide-react";
@@ -40,6 +40,9 @@ export default function RegistrationForm({
   const [signingIn, setSigningIn] = useState(false);
   const [activeSurveySlug, setActiveSurveySlug] = useState<string | null>(null);
   const [isMyRegistrationOpen, setIsMyRegistrationOpen] = useState(false);
+  const [registrationToReview, setRegistrationToReview] = useState<RegistrationInput | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     register,
@@ -61,6 +64,22 @@ export default function RegistrationForm({
   });
 
   const category = watch("participantCategory");
+
+  function closeRegistrationReview() {
+    if (isRegistering) return;
+    setRegistrationToReview(null);
+    requestAnimationFrame(() => submitButtonRef.current?.focus());
+  }
+
+  async function confirmRegistration() {
+    if (!registrationToReview || isRegistering) return;
+    setIsRegistering(true);
+    try {
+      await submit(registrationToReview);
+    } finally {
+      setIsRegistering(false);
+    }
+  }
 
   // Immediate cache check from sessionStorage for instant render on back/refresh
   useEffect(() => {
@@ -192,6 +211,8 @@ export default function RegistrationForm({
           // ignore
         }
       }
+      setRegistrationToReview(null);
+      requestAnimationFrame(() => submitButtonRef.current?.focus());
       return setErrorMessage(result.error ?? "Registration could not be completed.");
     }
     sessionStorage.setItem(
@@ -530,7 +551,7 @@ export default function RegistrationForm({
         <span>FORM / REG-2026</span>
         <span className="live-indicator">SECURE SESSION</span>
       </div>
-      <form onSubmit={handleSubmit(submit)} noValidate>
+      <form onSubmit={handleSubmit((values) => setRegistrationToReview(values))} noValidate>
         {!supabase && (
           <p className="demo-notice">
             Demo mode: connect Supabase in <code>.env.local</code> to enable Google authentication and persistent storage.
@@ -571,7 +592,7 @@ export default function RegistrationForm({
           </legend>
           <FormField
             label="Affiliation / Institution / Company"
-            description="If you are a student, please put your school (e.g., Gordon College)."
+            description="If you are a student, please enter your school (e.g., GCCCS - ByteCast)."
             error={errors.affiliation?.message}
           >
             <input
@@ -665,16 +686,85 @@ export default function RegistrationForm({
             <strong>Google Meet Link:</strong> The session link will be sent to your email.
           </span>
         </div>
-        <button className="button button-primary submit-button" type="submit" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <>
-              <LoaderCircle className="spin" aria-hidden="true" /> Recording registration
-            </>
-          ) : (
-            "Confirm my registration"
-          )}
+        <button ref={submitButtonRef} className="button button-primary submit-button" type="submit" disabled={isSubmitting || isRegistering}>
+          Review my information
         </button>
       </form>
+      {registrationToReview && (
+        <RegistrationReviewModal registration={registrationToReview} isSubmitting={isRegistering} onBack={closeRegistrationReview} onConfirm={confirmRegistration} />
+      )}
+    </div>
+  );
+}
+
+function RegistrationReviewModal({ registration, isSubmitting, onBack, onConfirm }: {
+  registration: RegistrationInput;
+  isSubmitting: boolean;
+  onBack: () => void;
+  onConfirm: () => void;
+}) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    backButtonRef.current?.focus();
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !isSubmitting) {
+        event.preventDefault();
+        onBack();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSubmitting, onBack]);
+
+  const categoryLabels: Record<RegistrationInput["participantCategory"], string> = {
+    student: "Student",
+    educator: "Faculty/Educator",
+    it_professional: "IT Professional",
+    general_public: "General Public",
+    other: registration.otherCategory || "Other",
+  };
+  const sessions = EVENT.sessions.filter((session) => registration.sessions.includes(session.key));
+
+  return (
+    <div className="registration-review-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onBack(); }}>
+      <div ref={dialogRef} className="registration-review-modal" role="dialog" aria-modal="true" aria-labelledby="registration-review-title" aria-describedby="registration-review-description">
+        <span className="form-step">FINAL CHECK</span>
+        <h2 id="registration-review-title">Review your registration</h2>
+        <p id="registration-review-description">Check that everything is correct, especially your name and email. Your certificate and event link will use these details.</p>
+        <dl className="registration-review-list">
+          <div><dt>Full name</dt><dd>{registration.fullName}</dd></div>
+          <div><dt>Email</dt><dd>{registration.email}</dd></div>
+          <div><dt>Affiliation</dt><dd>{registration.affiliation}</dd></div>
+          <div><dt>Category</dt><dd>{categoryLabels[registration.participantCategory]}</dd></div>
+          <div className="registration-review-sessions"><dt>Selected sessions</dt><dd>{sessions.map((session) => <span key={session.key}>Session {session.number}: {session.title}</span>)}</dd></div>
+        </dl>
+        <div className="registration-review-actions">
+          <button ref={backButtonRef} className="button" type="button" onClick={onBack} disabled={isSubmitting}>Go back and edit</button>
+          <button className="button button-primary" type="button" onClick={onConfirm} disabled={isSubmitting}>
+            {isSubmitting ? <><LoaderCircle className="spin" aria-hidden="true" /> Registering</> : "Submit registration"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
