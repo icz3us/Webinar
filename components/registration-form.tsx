@@ -1,4 +1,6 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +19,7 @@ type RegistrationFormProps = {
   initialRegistration?: ExistingRegistration | null;
   initialSurveys?: AvailableSurvey[];
   initialCompletedSessions?: string[];
+  serverChecked?: boolean;
 };
 
 export default function RegistrationForm({
@@ -24,9 +27,11 @@ export default function RegistrationForm({
   initialRegistration = null,
   initialSurveys = [],
   initialCompletedSessions = [],
+  serverChecked = true,
 }: RegistrationFormProps) {
+  const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
-  const [authReady, setAuthReady] = useState(Boolean(initialUser || initialRegistration || !supabase));
+  const [authReady, setAuthReady] = useState(Boolean(serverChecked || initialUser || initialRegistration || !supabase));
   const [authenticated, setAuthenticated] = useState(Boolean(initialUser || initialRegistration || !supabase));
   const [existingRegistration, setExistingRegistration] = useState<ExistingRegistration | null>(initialRegistration);
   const [availableSurveys, setAvailableSurveys] = useState<AvailableSurvey[]>(initialSurveys);
@@ -82,39 +87,51 @@ export default function RegistrationForm({
       setAuthReady(true);
       return;
     }
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (data.user?.email) {
+
+    // If server already provided initialRegistration, skip redundant network roundtrips
+    if (initialRegistration) {
+      setAuthReady(true);
+      return;
+    }
+
+    // Subscribe to auth state changes for immediate responsive state updates
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user?.email) {
         setAuthenticated(true);
-        setValue("email", data.user.email);
-        const name = data.user.user_metadata?.full_name;
+        setValue("email", session.user.email);
+        const name = session.user.user_metadata?.full_name;
         if (typeof name === "string") setValue("fullName", name);
 
-        // Check if user already has a registration
-        try {
-          const res = await fetch("/api/registration");
-          const json = await res.json();
-          if (json?.registration) {
-            setExistingRegistration(json.registration);
-            try {
-              sessionStorage.setItem("ddt-verified-registration", JSON.stringify(json));
-            } catch {}
-          }
-          if (json?.surveys) {
-            setAvailableSurveys(json.surveys);
-          }
-          if (json?.completedSurveySessionIds) {
-            setCompletedSurveySessionIds(json.completedSurveySessionIds);
-          }
-        } catch {
-          // ignore
+        // Fetch registration data in background if not already available
+        if (!existingRegistration) {
+          try {
+            const res = await fetch("/api/registration");
+            const json = await res.json();
+            if (json?.registration) {
+              setExistingRegistration(json.registration);
+              try {
+                sessionStorage.setItem("ddt-verified-registration", JSON.stringify(json));
+              } catch {}
+            }
+            if (json?.surveys) setAvailableSurveys(json.surveys);
+            if (json?.completedSurveySessionIds) {
+              setCompletedSurveySessionIds(json.completedSurveySessionIds);
+            }
+          } catch {}
         }
-      } else {
+      } else if (event === "SIGNED_OUT") {
         setAuthenticated(false);
         setExistingRegistration(null);
       }
       setAuthReady(true);
     });
-  }, [setValue, supabase]);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [existingRegistration, initialRegistration, setValue, supabase]);
 
   async function signIn() {
     if (!supabase) return setAuthenticated(true);
@@ -206,7 +223,7 @@ export default function RegistrationForm({
         })
       );
     } catch {}
-    window.location.assign("/confirmation");
+    router.push("/confirmation");
   }
 
   // View 1: Already registered user
@@ -466,7 +483,7 @@ export default function RegistrationForm({
         <div className="auth-gate">
           <span className="form-step">00 / VERIFY EMAIL</span>
           <h3>Begin with your Google account</h3>
-          <p>Your verified email will be used for the Zoom link and e-certificate.</p>
+          <p>Your verified email will be used for the Google Meet link and e-certificate.</p>
           <button
             className="button google-button"
             type="button"
@@ -504,7 +521,7 @@ export default function RegistrationForm({
           </legend>
           <FormField
             label="Email Address"
-            description="Please provide an active email where we will send the Zoom link and your e-certificate."
+            description="Please provide an active email where we will send the Google Meet link and e-certificate."
             error={errors.email?.message}
           >
             <input

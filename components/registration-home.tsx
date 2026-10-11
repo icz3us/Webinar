@@ -88,6 +88,7 @@ export default async function RegistrationHome() {
           initialRegistration={initialRegistration}
           initialSurveys={initialSurveys}
           initialCompletedSessions={initialCompletedSessions}
+          serverChecked={true}
         />
       </section>
       <footer className="registration-footer shell">

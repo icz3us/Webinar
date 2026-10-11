@@ -60,7 +60,7 @@ export default function ConfirmationPage() {
           <p className="empty-state">Registration details are available from your account.</p>
         )}
         <p className="receipt-note">
-          Zoom access information will be sent to your registered email when it is available.
+          Google Meet access information will be sent to your registered email when it is available.
           {data?.emailDelivered === false
             ? " Email delivery is not configured yet, so no email has been sent."
             : ""}

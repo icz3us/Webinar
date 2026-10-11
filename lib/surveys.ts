@@ -225,7 +225,7 @@ function getInitialLocalStore(): LocalStore {
         session: {
           id: session2Id,
           slug: "session-2",
-          title: "Deepfakes in the Workplace and School (Email, Zoom, News)",
+          title: "Deepfakes in the Workplace and School (Email, Google Meet, News)",
         },
         questions: [
           {
