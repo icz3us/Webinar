@@ -13,14 +13,19 @@ export default function CertificateArtwork({
     session.toLowerCase().includes("workplace");
 
   const speaker1 = isSession2
-    ? { name: "ROSETE, FRANCIS EMIL", role: "Resource Speaker" }
-    : { name: "UDANI, VARNARD PAULO", role: "Resource Speaker" };
+    ? { name: "ROSETE, FRANCIS EMIL", role: "Resource Speaker", sig: "/images/signatures/ROSETE_SIGNATURE.png", sigClass: "sig-rosete" }
+    : { name: "UDANI, VARNARD PAULO", role: "Resource Speaker", sig: "/images/signatures/UDANI_SIGNATURE.png", sigClass: "sig-udani" };
 
   const speaker2 = isSession2
-    ? { name: "GONZALES, ICON ZEUS", role: "Resource Speaker" }
-    : { name: "BALLON, GLENBERG JAMES", role: "Resource Speaker" };
+    ? { name: "GONZALES, ICON ZEUS", role: "Resource Speaker", sig: "/images/signatures/GONZALES_SIGNATURE.png", sigClass: "sig-gonzales" }
+    : { name: "BALLON, GLENBERG JAMES", role: "Resource Speaker", sig: "/images/signatures/BALLON_SIGNATURE.png", sigClass: "sig-ballon" };
 
-  const organizer = { name: "UDANI, VARNARD PAULO", role: "Event Head Organizer" };
+  const organizer = {
+    name: "UDANI, VARNARD PAULO",
+    role: "Event Head Organizer",
+    sig: "/images/signatures/UDANI_SIGNATURE.png",
+    sigClass: "sig-udani",
+  };
 
   return (
     <article className="certificate-art certificate-art-v2" id="certificate-preview" aria-label={`Certificate of participation for ${name}`}>
@@ -57,16 +62,25 @@ export default function CertificateArtwork({
       </div>
       <footer className="certificate-v2-footer certificate-v2-footer-3col">
         <div className="certificate-v2-signature">
+          <div className="certificate-v2-sig-wrap">
+            <img src={speaker1.sig} alt="" className={`certificate-v2-sig-img ${speaker1.sigClass}`} />
+          </div>
           <i aria-hidden="true" />
           <b>{speaker1.name}</b>
           <span>{speaker1.role}</span>
         </div>
         <div className="certificate-v2-signature">
+          <div className="certificate-v2-sig-wrap">
+            <img src={organizer.sig} alt="" className={`certificate-v2-sig-img ${organizer.sigClass}`} />
+          </div>
           <i aria-hidden="true" />
           <b>{organizer.name}</b>
           <span>{organizer.role}</span>
         </div>
         <div className="certificate-v2-signature">
+          <div className="certificate-v2-sig-wrap">
+            <img src={speaker2.sig} alt="" className={`certificate-v2-sig-img ${speaker2.sigClass}`} />
+          </div>
           <i aria-hidden="true" />
           <b>{speaker2.name}</b>
           <span>{speaker2.role}</span>

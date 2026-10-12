@@ -113,12 +113,36 @@ export async function GET(_: Request, { params }: { params: Promise<{ certificat
   document.text("DIGITAL CERTIFICATE", 148.5, sealY + 3.8, { align: "center" });
 
   const sigY = 168;
+  const x1 = 58;
+  const x2 = 148.5;
+  const x3 = 239;
+
   document.setDrawColor(...ink);
   document.setLineWidth(0.35);
+  document.line(x1 - 27, sigY, x1 + 27, sigY);
+  document.line(x2 - 27, sigY, x2 + 27, sigY);
+  document.line(x3 - 27, sigY, x3 + 27, sigY);
+
+  const sigDir = path.join(process.cwd(), "public", "images", "signatures");
+  try {
+    const udaniSig = new Uint8Array(await readFile(path.join(sigDir, "UDANI_SIGNATURE.png")));
+    if (isSession2) {
+      const roseteSig = new Uint8Array(await readFile(path.join(sigDir, "ROSETE_SIGNATURE.png")));
+      document.addImage(roseteSig, "PNG", x1 - 21, sigY - 16.5 + 6, 42, 16.5, undefined, "FAST");
+      const gonzalesSig = new Uint8Array(await readFile(path.join(sigDir, "GONZALES_SIGNATURE.png")));
+      document.addImage(gonzalesSig, "PNG", x3 - 16, sigY - 10.7 + 2.5, 32, 10.7, undefined, "FAST");
+    } else {
+      document.addImage(udaniSig, "PNG", x1 - 8.5, sigY - 28 + 8.5, 17, 28, undefined, "FAST");
+      const ballonSig = new Uint8Array(await readFile(path.join(sigDir, "BALLON_SIGNATURE.png")));
+      document.addImage(ballonSig, "PNG", x3 - 19, sigY - 21.5 + 7, 38, 21.5, undefined, "FAST");
+    }
+    // Center: Event Head Organizer (Udani)
+    document.addImage(udaniSig, "PNG", x2 - 8.5, sigY - 28 + 8.5, 17, 28, undefined, "FAST");
+  } catch (err) {
+    console.error("Failed to load certificate signatures:", err);
+  }
 
   // Left: Speaker 1
-  const x1 = 58;
-  document.line(x1 - 27, sigY, x1 + 27, sigY);
   document.setTextColor(...ink);
   document.setFont("helvetica", "bold");
   document.setFontSize(8.5);
@@ -129,8 +153,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ certificat
   document.text(speaker1.role, x1, sigY + 8.5, { align: "center" });
 
   // Center: Event Head Organizer
-  const x2 = 148.5;
-  document.line(x2 - 27, sigY, x2 + 27, sigY);
   document.setTextColor(...ink);
   document.setFont("helvetica", "bold");
   document.setFontSize(8.5);
@@ -141,8 +163,6 @@ export async function GET(_: Request, { params }: { params: Promise<{ certificat
   document.text(organizer.role, x2, sigY + 8.5, { align: "center" });
 
   // Right: Speaker 2
-  const x3 = 239;
-  document.line(x3 - 27, sigY, x3 + 27, sigY);
   document.setTextColor(...ink);
   document.setFont("helvetica", "bold");
   document.setFontSize(8.5);
