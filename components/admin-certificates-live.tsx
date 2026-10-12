@@ -4,6 +4,7 @@ import CertificateArtwork from "@/components/certificate-artwork";
 import CertificateActions from "@/components/certificate-actions";
 import SendCertificateButton from "@/components/send-certificate-button";
 import CertificateEligibilityTable from "@/components/certificate-eligibility-table";
+import { Download } from "lucide-react";
 
 export default async function AdminCertificatesLive({
   searchParams,
@@ -165,10 +166,57 @@ export default async function AdminCertificatesLive({
         />
       ) : (
         <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              margin: "24px 0 16px",
+              flexWrap: "wrap",
+              gap: "12px",
+              padding: "16px 20px",
+              background: "#fff",
+              border: "1px solid var(--line, #c9c7bd)",
+            }}
+          >
+            <div>
+              <span style={{ fontSize: "11px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--signal, #b74700)" }}>
+                Rendered Certificate Preview
+              </span>
+              <h2 style={{ fontSize: "17px", margin: "4px 0 0" }}>
+                {activeSlug === "session-2" ? "Session 02 Certificate" : "Session 01 Certificate"}
+              </h2>
+            </div>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              <a
+                href="/sample-session1.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                download="rendered-certificate-session1.pdf"
+                className="button"
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }}
+              >
+                <Download size={15} />
+                Download Session 1 Sample PDF
+              </a>
+              <a
+                href="/sample-session2.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                download="rendered-certificate-session2.pdf"
+                className="button"
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px" }}
+              >
+                <Download size={15} />
+                Download Session 2 Sample PDF
+              </a>
+            </div>
+          </div>
+
           <CertificateArtwork
             name={preview?.person.fullName ?? "Participant Name"}
-            session={preview?.session?.title ?? sessions[0]?.title ?? "Webinar Session"}
-            id={preview?.certificate.number ?? "DDT-PREVIEW"}
+            session={preview?.session?.title ?? (activeSlug === "session-2" ? sessions[1]?.title : sessions[0]?.title) ?? "Webinar Session"}
+            id={preview?.certificate.number ?? (activeSlug === "session-2" ? "DDT-2026-SESSION2-SAMPLE" : "DDT-2026-SESSION1-SAMPLE")}
           />
 
           <div className="data-table-wrap">

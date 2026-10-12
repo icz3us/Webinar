@@ -23,6 +23,9 @@ type SubmissionResult = {
   attendanceConfirmed: boolean;
   surveyCompleted: boolean;
   certificateEligible: boolean;
+  certificateNumber?: string;
+  certificateUrl?: string;
+  verifyUrl?: string;
   message: string;
 };
 
@@ -198,12 +201,27 @@ export default function ParticipantSurvey({
 
           <p className="receipt-note" style={{ marginTop: "24px" }}>
             {submissionResult.certificateEligible
-              ? "All certificate requirements are satisfied: Registered + Present + Survey completed. Your e-certificate is generated and available in your registration record."
+              ? "All certificate requirements are satisfied: Registered + Present + Survey completed. Your official e-certificate has been issued and sent to your email."
               : "Attendance verification is required before your certificate is generated. Once the organizer verifies your attendance, your certificate will automatically become eligible."}
           </p>
 
-          <div className="receipt-actions" style={{ marginTop: "32px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-            <a href="/my-registration" className="button button-primary" style={{ minHeight: "48px" }}>
+          <div className="receipt-actions" style={{ marginTop: "32px", display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+            {submissionResult.certificateUrl ? (
+              <a
+                href={submissionResult.certificateUrl}
+                download
+                className="button button-primary"
+                style={{ minHeight: "48px", display: "inline-flex", alignItems: "center", gap: "8px" }}
+              >
+                <Download size={18} />
+                Download Certificate (PDF)
+              </a>
+            ) : null}
+            <a
+              href="/my-registration"
+              className={submissionResult.certificateUrl ? "button" : "button button-primary"}
+              style={{ minHeight: "48px" }}
+            >
               View My Registration &amp; Certificates
             </a>
             <a href="/" className="button" style={{ minHeight: "48px" }}>

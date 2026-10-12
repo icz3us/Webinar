@@ -9,6 +9,7 @@ import {
   LoaderCircle,
   ShieldCheck,
   Star,
+  Download,
   X,
 } from "lucide-react";
 import { Survey } from "@/lib/surveys";
@@ -33,6 +34,9 @@ type SubmissionResult = {
   attendanceConfirmed: boolean;
   surveyCompleted: boolean;
   certificateEligible: boolean;
+  certificateNumber?: string;
+  certificateUrl?: string;
+  verifyUrl?: string;
   message: string;
 };
 
@@ -400,8 +404,19 @@ export default function SurveyPopupModal({
                     </div>
                   </div>
 
-                  <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-                    <button onClick={onClose} className="button button-primary" style={{ minHeight: "44px" }}>
+                  <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", flexWrap: "wrap", alignItems: "center" }}>
+                    {submissionResult.certificateUrl ? (
+                      <a
+                        href={submissionResult.certificateUrl}
+                        download
+                        className="button button-primary"
+                        style={{ minHeight: "44px", display: "inline-flex", alignItems: "center", gap: "8px" }}
+                      >
+                        <Download size={16} />
+                        Download Certificate (PDF)
+                      </a>
+                    ) : null}
+                    <button onClick={onClose} className={submissionResult.certificateUrl ? "button" : "button button-primary"} style={{ minHeight: "44px" }}>
                       Done
                     </button>
                   </div>

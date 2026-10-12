@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Download } from "lucide-react";
 
 export default function CertificateActions({
   sessions,
@@ -98,6 +99,33 @@ export default function CertificateActions({
           ? "Email session certificates"
           : "Email all certificates"}
       </button>
+
+      <div style={{ display: "inline-flex", gap: "8px", alignItems: "center", marginLeft: "auto", flexWrap: "wrap" }}>
+        <a
+          href="/sample-session1.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          download="rendered-certificate-session1.pdf"
+          className="button"
+          style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}
+          title="Download rendered sample PDF for Session 1"
+        >
+          <Download size={14} />
+          Sample PDF (S1)
+        </a>
+        <a
+          href="/sample-session2.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          download="rendered-certificate-session2.pdf"
+          className="button"
+          style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px" }}
+          title="Download rendered sample PDF for Session 2"
+        >
+          <Download size={14} />
+          Sample PDF (S2)
+        </a>
+      </div>
 
       {message && <p role="status">{message}</p>}
     </div>

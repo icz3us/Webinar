@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSurveyBySlug, submitSurveyResponse, hasUserSubmittedSurvey } from "@/lib/surveys";
+import { sendEmail } from "@/lib/email";
+import { emailLayout, escapeHtml } from "@/lib/email-html";
 
 export async function GET(
   _: Request,
@@ -300,6 +302,72 @@ export async function POST(
 
   const isPresent = attendanceStatus === "present";
 
+  let certificateNumber: string | undefined;
+  let certificateUrl: string | undefined;
+  let verifyUrl: string | undefined;
+
+  if (isPresent) {
+    // 1. Ensure certificate record exists and retrieve certificate number
+    let { data: cert } = await adminClient
+      .from("certificates")
+      .select("id, certificate_number, status, issued_at")
+      .eq("registration_id", reg.id)
+      .eq("session_id", survey.sessionId)
+      .neq("status", "revoked")
+      .maybeSingle();
+
+    if (!cert) {
+      const { data: newCert } = await adminClient
+        .from("certificates")
+        .insert({
+          registration_id: reg.id,
+          session_id: survey.sessionId,
+          generated_by: user.id,
+          status: "issued",
+          issued_at: new Date().toISOString(),
+        })
+        .select("id, certificate_number, status, issued_at")
+        .maybeSingle();
+      cert = newCert;
+    }
+
+    if (cert?.certificate_number) {
+      const certNum = cert.certificate_number;
+      certificateNumber = certNum;
+      const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
+      certificateUrl = `${origin}/api/certificates/${encodeURIComponent(certNum)}`;
+      verifyUrl = `${origin}/verify/${encodeURIComponent(certNum)}`;
+
+      // 2. Trigger notification email in background (fail-safe)
+      const sessionTitle = survey.session?.title ?? survey.title ?? "the webinar session";
+      const recipientName = reg.full_name ?? "Participant";
+      sendEmail({
+        to: reg.email,
+        toName: recipientName,
+        subject: `Your Certificate: ${sessionTitle}`,
+        tags: ["certificate-notification"],
+        html: emailLayout(
+          "Your certificate is ready",
+          `
+            <p>Hello ${escapeHtml(recipientName)},</p>
+            <p>Thank you for attending and completing the survey for <strong>${escapeHtml(sessionTitle)}</strong>.</p>
+            <p>Your official Certificate of Participation has been issued:</p>
+            <p style="margin:24px 0">
+              <a href="${certificateUrl}" style="display:inline-block;background:#cf4c10;color:#fff;text-decoration:none;padding:13px 22px;font-weight:700">
+                Download Certificate PDF
+              </a>
+            </p>
+            <p style="font-size:13px;color:#555">
+              Public verification: <a href="${verifyUrl}">${verifyUrl}</a>
+            </p>
+          `
+        ),
+      }).catch((emailErr) => {
+        console.error("Certificate auto-email error:", emailErr);
+      });
+    }
+  }
+
   return NextResponse.json({
     success: true,
     responseId: result.responseId,
@@ -307,8 +375,11 @@ export async function POST(
     attendanceConfirmed: isPresent,
     surveyCompleted: true,
     certificateEligible: isPresent,
+    certificateNumber,
+    certificateUrl,
+    verifyUrl,
     message: isPresent
-      ? "Survey submitted successfully! Your certificate is now eligible and ready."
+      ? "Survey submitted successfully! Your certificate has been issued and emailed to you."
       : "Survey submitted successfully! Attendance is pending verification.",
   });
 }

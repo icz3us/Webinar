@@ -539,6 +539,110 @@
   border-color: #8c2d1e;
 }
 
+/* Attendance Quick Filter Summary Bar */
+.attendance-summary-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.attendance-chip {
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid var(--line, #c9c7bd);
+  background: #f8f6ef;
+  color: var(--ink, #171814);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.attendance-chip:hover {
+  background: #edeae0;
+  border-color: #8d8d85;
+}
+
+.attendance-chip.active {
+  background: var(--ink, #171814);
+  color: #fff;
+  border-color: var(--ink, #171814);
+}
+
+.attendance-chip .chip-count {
+  font-family: var(--font-geist-mono, monospace);
+  font-size: 11px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.attendance-chip.active .chip-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.attendance-chip.chip-present.active {
+  background: var(--green, #426b4c);
+  border-color: var(--green, #426b4c);
+}
+
+.attendance-chip.chip-absent.active {
+  background: #8c2d1e;
+  border-color: #8c2d1e;
+}
+
+.attendance-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--muted, #676860);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.attendance-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-family: var(--font-geist-mono, monospace);
+  font-weight: 700;
+  padding: 2px 6px;
+  border: 1px solid transparent;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.attendance-badge.present {
+  background: #e6f0e7;
+  border-color: #78927e;
+  color: #244d2d;
+}
+
+.attendance-badge.absent {
+  background: #fff1ed;
+  border-color: #a52b18;
+  color: #8d2413;
+}
+
+.attendance-badge.unmarked {
+  background: #f0ede4;
+  border-color: #c9c7bd;
+  color: #555650;
+}
+
+.attendance-meta {
+  display: block;
+  font-size: 12px;
+  color: var(--muted, #676860);
+  margin-top: 3px;
+}
+
 /* Operations and Messages */
 .operation-message {
   padding: 12px 16px;
@@ -827,6 +931,23 @@
   .certificate-actions .button {
     width: 100%;
     min-height: 44px;
+  }
+
+  .attendance-summary-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .attendance-chip {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .attendance-results-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .attendance-list article {
