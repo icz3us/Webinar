@@ -1,0 +1,2 @@
+export const HARDCODED_CLOSED_MESSAGE =
+  "Thank you for your interest in the Deepfakes and Digital Trust webinar. Online registration is now closed as all available slots have been filled. If you have already registered, your slot remains confirmed. You can sign in with your Google account below to view your registration details, access sessions, and check certificate eligibility. We appreciate your interest and look forward to welcoming you to future events.";

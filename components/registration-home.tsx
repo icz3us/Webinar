@@ -6,8 +6,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getPublishedSurveysSummary, getCompletedSurveySessionIds } from "@/lib/surveys";
 
 import { EVENT } from "@/lib/event";
+import { isRegistrationOpen, HARDCODED_CLOSED_MESSAGE } from "@/lib/registration-status";
 
 export default async function RegistrationHome() {
+  const registrationOpen = await isRegistrationOpen();
   let initialUser: { id: string; email: string; name?: string } | null = null;
   let initialRegistration = null;
   let initialSurveys: any[] = [];
@@ -65,9 +67,20 @@ export default async function RegistrationHome() {
             placeholder="blur"
           />
           <div className="direct-summary">
-            <span className="section-index">REGISTRATION / OPEN</span>
-            <h1 id="registration-title">Register for the Webinar</h1>
-            <p>Join us to learn how to identify manipulated AI-generated media and verify online information.</p>
+            <span
+              className="section-index"
+              style={registrationOpen ? undefined : { color: "#a52b18" }}
+            >
+              REGISTRATION / {registrationOpen ? "OPEN" : "CLOSED"}
+            </span>
+            <h1 id="registration-title">
+              {registrationOpen ? "Register for the Webinar" : "Webinar Registration"}
+            </h1>
+            <p>
+              {registrationOpen
+                ? "Join us to learn how to identify manipulated AI-generated media and verify online information."
+                : "Thank you for your interest. Online registration is officially closed. Registered participants can sign in to view their status."}
+            </p>
             <div className="direct-session">
               <b>Session 01</b>
               <span>Deepfakes in Everyday Social Media</span>
@@ -92,6 +105,8 @@ export default async function RegistrationHome() {
           initialSurveys={initialSurveys}
           initialCompletedSessions={initialCompletedSessions}
           serverChecked={true}
+          registrationOpen={registrationOpen}
+          closedMessage={HARDCODED_CLOSED_MESSAGE}
         />
       </section>
       <footer className="registration-footer shell">

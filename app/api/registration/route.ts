@@ -5,12 +5,14 @@ import { sendEmail } from "@/lib/email";
 import { checkRegistrationRateLimit } from "@/lib/rate-limit";
 
 import { getPublishedSurveysSummary, getCompletedSurveySessionIds } from "@/lib/surveys";
+import { isRegistrationOpen, HARDCODED_CLOSED_MESSAGE } from "@/lib/registration-status";
 
 export async function GET() {
   const supabase = await createClient();
-  if (!supabase) return NextResponse.json({ registration: null, demo: true });
+  const registrationOpen = await isRegistrationOpen();
+  if (!supabase) return NextResponse.json({ registration: null, demo: true, registrationOpen });
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Authentication required.", registrationOpen }, { status: 401 });
 
   const [regResult, publishedSurveys] = await Promise.all([
     supabase
@@ -22,7 +24,7 @@ export async function GET() {
   ]);
 
   if (regResult.error) {
-    return NextResponse.json({ error: "We could not load your registration." }, { status: 500 });
+    return NextResponse.json({ error: "We could not load your registration.", registrationOpen }, { status: 500 });
   }
 
   const completedSurveySessions = regResult.data?.id
@@ -33,10 +35,19 @@ export async function GET() {
     registration: regResult.data,
     surveys: publishedSurveys,
     completedSurveySessionIds: Array.from(completedSurveySessions),
+    registrationOpen,
   });
 }
 
 export async function POST(request: Request) {
+  const registrationOpen = await isRegistrationOpen();
+  if (!registrationOpen) {
+    return NextResponse.json(
+      { error: HARDCODED_CLOSED_MESSAGE },
+      { status: 403 }
+    );
+  }
+
   const supabase = await createClient();
   if (!supabase) return NextResponse.json({ error: "Registration is not configured." }, { status: 503 });
   const { data: { user } } = await supabase.auth.getUser();

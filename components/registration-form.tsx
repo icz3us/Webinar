@@ -13,6 +13,7 @@ import MyRegistrationModal, {
   type RegistrationData as ExistingRegistration,
   type SurveyItem as AvailableSurvey,
 } from "@/components/my-registration-modal";
+import { HARDCODED_CLOSED_MESSAGE } from "@/lib/registration-constants";
 
 type RegistrationFormProps = {
   initialUser?: { id: string; email: string; name?: string } | null;
@@ -20,6 +21,8 @@ type RegistrationFormProps = {
   initialSurveys?: AvailableSurvey[];
   initialCompletedSessions?: string[];
   serverChecked?: boolean;
+  registrationOpen?: boolean;
+  closedMessage?: string;
 };
 
 export default function RegistrationForm({
@@ -28,9 +31,12 @@ export default function RegistrationForm({
   initialSurveys = [],
   initialCompletedSessions = [],
   serverChecked = true,
+  registrationOpen = true,
+  closedMessage = HARDCODED_CLOSED_MESSAGE,
 }: RegistrationFormProps) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  const [isOpen, setIsOpen] = useState(registrationOpen);
   const [authReady, setAuthReady] = useState(Boolean(serverChecked || initialUser || initialRegistration || !supabase));
   const [authenticated, setAuthenticated] = useState(Boolean(initialUser || initialRegistration || !supabase));
   const [existingRegistration, setExistingRegistration] = useState<ExistingRegistration | null>(initialRegistration);
@@ -138,6 +144,9 @@ export default function RegistrationForm({
             if (json?.completedSurveySessionIds) {
               setCompletedSurveySessionIds(json.completedSurveySessionIds);
             }
+            if (typeof json?.registrationOpen === "boolean") {
+              setIsOpen(json.registrationOpen);
+            }
           } catch {}
         }
       } else if (event === "SIGNED_OUT") {
@@ -151,6 +160,12 @@ export default function RegistrationForm({
       subscription.unsubscribe();
     };
   }, [existingRegistration, initialRegistration, setValue, supabase]);
+
+  useEffect(() => {
+    if (typeof registrationOpen === "boolean") {
+      setIsOpen(registrationOpen);
+    }
+  }, [registrationOpen]);
 
   async function signIn() {
     if (!supabase) return setAuthenticated(true);
@@ -509,6 +524,77 @@ export default function RegistrationForm({
           <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--foreground, #171814)" }}>
             Checking registration status...
           </span>
+        </div>
+      </div>
+    );
+  }
+
+  // View 1b: Registration is closed
+  if (!isOpen) {
+    if (!authenticated) {
+      return (
+        <div className="registration-form-wrap reveal">
+          <div className="form-status-line">
+            <span>STATUS / REGISTRATION CLOSED</span>
+            <span style={{ color: "#a52b18", fontWeight: 700, fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase" }}>
+              OFFICIALLY CLOSED
+            </span>
+          </div>
+          <div className="auth-gate" style={{ textAlign: "left" }}>
+            <span className="form-step">EVENT NOTICE</span>
+            <h3 style={{ margin: "16px 0 12px", fontSize: "28px", letterSpacing: "-.03em" }}>Registration is Closed</h3>
+            <p style={{ margin: "0 0 18px", color: "var(--muted, #666)", lineHeight: "1.65", fontSize: "15px" }}>
+              {closedMessage || HARDCODED_CLOSED_MESSAGE}
+            </p>
+            <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--line, #c9c7bd)" }}>
+              <p style={{ margin: "0 0 12px", fontWeight: 600, fontSize: "14px" }}>
+                Already registered? Sign in to check your confirmed registration details:
+              </p>
+              <button
+                className="button google-button"
+                type="button"
+                onClick={signIn}
+                disabled={!authReady || signingIn}
+              >
+                {signingIn ? "Connecting to Google..." : "Sign in to view existing registration"}
+              </button>
+              {errorMessage && (
+                <p className="form-alert" role="alert" style={{ marginTop: "12px" }}>
+                  {errorMessage}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Authenticated, but no existing registration found in the system
+    return (
+      <div className="registration-form-wrap reveal">
+        <div className="form-status-line">
+          <span>STATUS / REGISTRATION CLOSED</span>
+          <span style={{ color: "#a52b18", fontWeight: 700, fontSize: "11px", letterSpacing: ".06em", textTransform: "uppercase" }}>
+            NOT REGISTERED
+          </span>
+        </div>
+        <div className="auth-gate" style={{ textAlign: "left" }}>
+          <span className="form-step">EVENT NOTICE</span>
+          <h3 style={{ margin: "16px 0 12px", fontSize: "26px", letterSpacing: "-.03em" }}>No Registration Found</h3>
+          <p style={{ margin: "0 0 14px", color: "var(--muted, #666)", lineHeight: "1.6" }}>
+            We could not find an existing registration associated with <strong>{watch("email") || initialUser?.email || "this Google account"}</strong>.
+          </p>
+          <p style={{ margin: "0 0 20px", color: "var(--muted, #666)", lineHeight: "1.65" }}>
+            {closedMessage || HARDCODED_CLOSED_MESSAGE}
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "22px" }}>
+            <button className="button" type="button" onClick={signOut}>
+              Sign out / Switch account
+            </button>
+            <a className="button button-primary" href="/verify">
+              Verify a certificate
+            </a>
+          </div>
         </div>
       </div>
     );
