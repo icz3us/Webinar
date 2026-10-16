@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { EVENT } from "@/lib/event";
+import { getSessionLabel } from "@/lib/session-label";
 
 export type SessionInfo = { id?: string; title: string; slug: string };
 export type AttendanceRecord = { session_id: string; status: string };
@@ -428,8 +429,7 @@ export default function MyRegistrationModal({
                     const matchingSurvey = surveys.find(
                       (s) =>
                         (sessionId && s.sessionId === sessionId) ||
-                        (s.publicSlug.includes("session-1") && index === 0) ||
-                        (s.publicSlug.includes("session-2") && index === 1)
+                        (session.slug && s.sessionSlug === session.slug)
                     );
                     const cert = isPresent && surveyDone && sessionId ? certificateMap.get(sessionId) : null;
                     const isEligible = isPresent && surveyDone;
@@ -450,7 +450,7 @@ export default function MyRegistrationModal({
                         }}
                       >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px", minWidth: 0 }}>
-                          <span style={{ fontWeight: 700, fontSize: "14px" }}>Session 0{index + 1}</span>
+                          <span style={{ fontWeight: 700, fontSize: "14px" }}>{getSessionLabel(session.slug)}</span>
                           <span
                             style={{
                               fontSize: "11px",

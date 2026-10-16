@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { EVENT } from "@/lib/event";
 import { getSurveys, getCompletedSurveySessionIds } from "@/lib/surveys";
+import { getSessionLabel } from "@/lib/session-label";
 import { CheckCircle2, AlertCircle, FileBadge, ArrowRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -113,7 +114,7 @@ export default async function MyRegistration() {
               </p>
 
               <div className="session-summary" style={{ gridTemplateColumns: "1fr", gap: "20px" }}>
-                {sessions.map((session, index) => {
+                {sessions.map((session) => {
                   const status = attendanceMap.get(session.id);
                   const isPresent = status === "present";
                   const isAbsent = status === "absent";
@@ -136,7 +137,7 @@ export default async function MyRegistration() {
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                        <span style={{ fontWeight: 700, fontSize: "16px" }}>Session 0{index + 1}</span>
+                        <span style={{ fontWeight: 700, fontSize: "16px" }}>{getSessionLabel(session.slug)}</span>
                         <span
                           style={{
                             fontSize: "12px",
